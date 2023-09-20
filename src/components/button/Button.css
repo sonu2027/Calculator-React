@@ -1,0 +1,24 @@
+.button{
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    grid-gap: 0.5rem;
+}
+.button .box{
+    border-radius: 50%;
+    height: 4rem;
+    width: 4rem;
+    font-size: 125%;
+    font-weight: 550;
+    border: none;
+    background-color: #eaeaea;
+}
+
+.button .box:hover{
+    cursor: pointer;
+}
+.button-box{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 2rem;
+}
