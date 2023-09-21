@@ -30,105 +30,80 @@ function reducer(state, action) {
     console.log("newarr", newArray);
 
 
-    let new1Array = []
-    let found = false
-    let ans = 0
-    for (let i = newArray.length - 1; i >= 0; i--) {
-      if (newArray[i - 1] == '^' && found == false) {
-        ans = Math.pow(newArray[i - 2], newArray[i])
-        new1Array.push(ans)
-        found = true
-        i -= 2
-      }
-      else {
-        new1Array.push(newArray[i])
-      }
-    }
-    new1Array.reverse()
-
-
-    let new2Array = []
-    found = false
-    ans = 0
-    for (let i = 0; i < new1Array.length; i++) {
-      if (new1Array[i] == "√" && found == false) {
-        ans = Math.sqrt(new1Array[i + 1])
-        new2Array.push(ans)
-        found = true
-        i += 1
-      }
-      else {
-        new2Array.push(new1Array[i])
-      }
-    }
-
-
-
-    let new3Array = []
-    found = false
-    ans = 0
-    for (let i = 0; i < new2Array.length; i++) {
-      if (new2Array[i + 1] == '/' && found == false) {
-        ans = new2Array[i] / new2Array[i + 2]
-        new3Array.push(ans)
-        found = true
-        i += 2
-      }
-      else {
-        new3Array.push(new2Array[i])
-      }
-    }
-
-    let new4Array = []
-    found = false
-    ans = 0
-    for (let i = 0; i < new3Array.length; i++) {
-      if (new3Array[i + 1] == '*' && found == false) {
-        ans = new3Array[i] * new3Array[i + 2]
-        new4Array.push(ans)
-        found = true
-        i += 2
-      }
-      else {
-        new4Array.push(new3Array[i])
-      }
-    }
-
-
-
-
-    let new5Array = []
-    let count = 0
-    ans = 0
-    for (let i = 0; i < new4Array.length; i++) {
-      if (new4Array[i + 1] == '-' && found == false) {
-        if (count == 0) {
-          ans = new4Array[i] - new4Array[i + 2]
-          // new5Array.push(ans)
-          count++
-          i += 2
-        }
-        else {
-          ans = ans - new4Array[i + 2]
-          // new5Array.push(ans)
-          count++
-          i += 2
+    function calculateExpression(expression) {
+      const operators = {
+        "+": 1,
+        "-": 1,
+        "*": 2,
+        "/": 2,
+        "^": 3,
+        "√": 3,
+      };
+    
+      const outputQueue = [];
+      const operatorStack = [];
+    
+      for (const token of expression) {
+        if (typeof token === "number") {
+          outputQueue.push(token);
+        } else if (typeof token === "string") {
+          while (
+            operatorStack.length > 0 &&
+            operators[token] <= operators[operatorStack[operatorStack.length - 1]]
+          ) {
+            outputQueue.push(operatorStack.pop());
+          }
+          operatorStack.push(token);
         }
       }
-      else if(count>0){
-        new5Array.push(ans)
-        ans=0
+    
+      while (operatorStack.length > 0) {
+        outputQueue.push(operatorStack.pop());
       }
-      else {
-        new5Array.push(new4Array[i])
+    
+      const resultStack = [];
+    
+      for (const token of outputQueue) {
+        if (typeof token === "number") {
+          resultStack.push(token);
+        } else if (typeof token === "string") {
+          if (token === "√") {
+            const operand = resultStack.pop();
+            resultStack.push(Math.sqrt(operand));
+          } else if (token === "^") {
+            const exponent = resultStack.pop();
+            const base = resultStack.pop();
+            resultStack.push(Math.pow(base, exponent));
+          } else {
+            const b = resultStack.pop();
+            const a = resultStack.pop();
+            if (token === "+") resultStack.push(a + b);
+            else if (token === "-") resultStack.push(a - b);
+            else if (token === "*") resultStack.push(a * b);
+            else if (token === "/") resultStack.push(a / b);
+          }
+        }
+      }
+    
+      if (resultStack.length === 1) {
+        return resultStack[0];
+      } else {
+
+        return "Invalid Expression";
       }
     }
-
-
-
-
-    state = new5Array
-    return state
+    
+    
+    
+    
+    
+    const result = calculateExpression(newArray);
+    console.log("result", result); 
+    
+    
+    
+    return [result]
+    
   }
   else {
     return [...state, action.val]
@@ -141,6 +116,7 @@ function App() {
 
   useEffect(() => {
     setInputValueString(inputValue.join(""))
+    console.log("inpyt str", inputValueString);
   }, [inputValue])
 
   function handleArrayOfInputValue(num) {
@@ -152,9 +128,6 @@ function App() {
     }
     else if (num == "=") {
       setInputValue({ type: "getAns" })
-      if (inputValue.length > 1) {
-        setInputValue({ type: "getAns" })
-      }
     }
     else {
       setInputValue({ type: "Update", val: num })
@@ -166,8 +139,7 @@ function App() {
   return (
     <div className="main-div">
       <div className="child-div">
-        {/* {gotAns == false ? <Input val={inputValue} change={handleArrayOfInputValue} /> :
-          <Input val={finalAns} change={handleArrayOfInputValue} />} */}
+        <h1 style={{textAlign:"center", marginTop:"1rem", textDecoration:"underline"}}>Calculator</h1>
         <Input val={inputValueString} change={handleArrayOfInputValue} />
         <Button click={handleArrayOfInputValue} />
       </div>

@@ -16,3 +16,9 @@
 .input-div input:focus{
     outline: none;
 }
+
+@media screen and (max-width:500px){
+    .input-div{
+        margin-top: 1rem;
+    }
+}
